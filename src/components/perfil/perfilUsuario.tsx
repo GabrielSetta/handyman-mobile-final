@@ -17,6 +17,7 @@ import { useNavigation, CommonActions } from '@react-navigation/native';
 import { User } from '../../model/User';
 import { UserService } from '../../services/UserService';
 import { useAuth } from '../../context/AuthContext';
+import { VisualizacaoRanking } from '../ranking/VisualizacaoRanking';
 
 const { height } = Dimensions.get('window');
 
@@ -29,6 +30,7 @@ const PerfilUsuario = () => {
   
   const [usuario, setUsuario] = useState<User | undefined>(undefined);
   const [isPrestador, setIsPrestador] = useState<boolean>(false);
+  const [showRanking, setShowRanking] = useState<boolean>(false);
   //const [nome, setNome] = useState<string>('');
   //const [email, setEmail] = useState<string>('');
   const [telefone, setTelefone] = useState<string>('');
@@ -157,6 +159,25 @@ const PerfilUsuario = () => {
           </View>
         )}
 
+        {/* Seção de Ranking */}
+        <View style={styles.rankingSection}>
+          <Text style={styles.sectionTitle}>Meu Ranking</Text>
+          <TouchableOpacity
+            style={styles.rankingButton}
+            onPress={() => setShowRanking(!showRanking)}
+          >
+            <Text style={styles.rankingButtonText}>
+              {showRanking ? 'Ocultar Ranking' : 'Ver Meu Ranking'}
+            </Text>
+          </TouchableOpacity>
+          
+          {showRanking && (
+            <View style={styles.rankingContainer}>
+              <VisualizacaoRanking id_usuario={userId || ''} />
+            </View>
+          )}
+        </View>
+
         <TouchableOpacity style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>Salvar Detalhes</Text>
         </TouchableOpacity>
@@ -213,12 +234,34 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 20,
+    marginBottom: 10,
   },
   input: {
     backgroundColor: '#f1f1f1',
     borderRadius: 8,
     padding: 10,
     marginTop: 10,
+  },
+  rankingSection: {
+    marginTop: 20,
+  },
+  rankingButton: {
+    backgroundColor: '#A75C00',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  rankingButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  rankingContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 10,
+    minHeight: 300,
   },
   button: {
     backgroundColor: '#007bff',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';
@@ -10,6 +10,9 @@ import { RootTabParamList } from '../../navigation/TabNavigation';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import axios from 'axios';
 import { API_URL } from '../../constants/ApiUrl';
+import { RankingService } from '../../services/RankingService';
+import { RankingData, NivelRanking } from '../../types/rankingType';
+import { PreviewRankingUsuario } from '../ranking/PreviewRankingUsuario';
 
 type NavigationProp = CompositeNavigationProp<
     BottomTabNavigationProp<RootTabParamList>,
@@ -32,6 +35,46 @@ export const CardAgendamentoFornecedor: React.FC<CardAgendamentoFornecedorProps>
     const statusConfig = getStatusConfig(solicitacao.servico.status);
     const [showNegociacaoModal, setShowNegociacaoModal] = useState(false);
     const [novoValor, setNovoValor] = useState('');
+    const [rankingUsuario, setRankingUsuario] = useState<RankingData | null>(null);
+    const [showRankingModal, setShowRankingModal] = useState(false);
+    const [loadingRanking, setLoadingRanking] = useState(false);
+
+    // Buscar ranking do usuário quando o componente montar
+    useEffect(() => {
+        if (solicitacao.usuario?.id_usuario) {
+            buscarRankingUsuario(solicitacao.usuario.id_usuario);
+        }
+    }, [solicitacao.usuario?.id_usuario]);
+
+    const buscarRankingUsuario = async (idUsuario: string) => {
+        setLoadingRanking(true);
+        try {
+            const ranking = await RankingService.getRankingUsuario(idUsuario);
+            setRankingUsuario(ranking);
+        } catch (error) {
+            console.error('Erro ao buscar ranking do usuário:', error);
+            // Se não conseguir buscar, define um ranking padrão
+            setRankingUsuario({
+                nivel: 'Bronze',
+                score: 0,
+                total_avaliacoes: 0,
+                aspectos_negativos: []
+            });
+        } finally {
+            setLoadingRanking(false);
+        }
+    };
+
+    const getNivelIcon = (nivel: string) => {
+        switch (nivel) {
+            case 'Bronze': return '🥉';
+            case 'Prata': return '🥈';
+            case 'Ouro': return '🥇';
+            case 'Platina': return '💎';
+            case 'Diamante': return '💎';
+            default: return '🥉';
+        }
+    };
 
     const handleCardPress = () => {
         navigation.navigate('FornecedorStack', {
@@ -67,6 +110,10 @@ export const CardAgendamentoFornecedor: React.FC<CardAgendamentoFornecedorProps>
         }
     };
 
+    const handleVerRanking = () => {
+        setShowRankingModal(true);
+    };
+
     return (
         <TouchableOpacity style={styles.cardContainer} onPress={handleCardPress}>
             <View style={styles.headerContainer}>
@@ -75,7 +122,21 @@ export const CardAgendamentoFornecedor: React.FC<CardAgendamentoFornecedorProps>
                     style={styles.userImage}
                 />
                 <View style={styles.userInfo}>
-                    <Text style={styles.userName}>{solicitacao.usuario?.nome || 'Cliente'}</Text>
+                    <View style={styles.userNameContainer}>
+                        <Text style={styles.userName}>{solicitacao.usuario?.nome || 'Cliente'}</Text>
+                        {rankingUsuario && (
+                            <TouchableOpacity
+                                style={styles.rankingBadge}
+                                onPress={handleVerRanking}
+                                disabled={loadingRanking}
+                            >
+                                <Text style={styles.rankingIcon}>
+                                    {loadingRanking ? '⏳' : getNivelIcon(rankingUsuario.nivel)}
+                                </Text>
+                                <Text style={styles.rankingText}>{rankingUsuario.nivel}</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
                     <Text style={styles.serviceCategory}>{solicitacao.servico.categoria}</Text>
                 </View>
             </View>
@@ -233,6 +294,15 @@ export const CardAgendamentoFornecedor: React.FC<CardAgendamentoFornecedorProps>
                     </View>
                 </View>
             </Modal>
+
+            {/* Modal de Ranking do Usuário */}
+            {solicitacao.usuario?.id_usuario && (
+                <PreviewRankingUsuario
+                    id_usuario={solicitacao.usuario.id_usuario}
+                    visible={showRankingModal}
+                    onClose={() => setShowRankingModal(false)}
+                />
+            )}
         </TouchableOpacity>
     );
 };
@@ -266,14 +336,40 @@ const styles = StyleSheet.create({
     userInfo: {
         flex: 1,
     },
+    userNameContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+    },
     userName: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
+        marginRight: 8,
+    },
+    rankingBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F5F5F5',
+        borderWidth: 1,
+        borderColor: '#A75C00',
+        borderRadius: 12,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+    },
+    rankingIcon: {
+        fontSize: 12,
+        marginRight: 4,
+    },
+    rankingText: {
+        fontSize: 10,
+        fontWeight: '600',
+        color: '#A75C00',
     },
     serviceCategory: {
         fontSize: 14,
         color: '#666',
+        marginTop: 4,
     },
     detailsContainer: {
         marginBottom: 15,
