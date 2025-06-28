@@ -13,17 +13,18 @@ import { useNavigation } from '@react-navigation/native';
 import { ArrowRight } from 'lucide-react-native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../navigation/TabNavigation';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AuthStackNavigation';
 
 const { width, height } = Dimensions.get('window');
 declare function require(path: string): any;
 
-
 type HomeScreenNavigationProp = BottomTabNavigationProp<RootTabParamList, 'Home'>;
+type StackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const HomeScreen = () => {
-  
-
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const stackNavigation = useNavigation<StackNavigationProp>();
 
   /*useEffect(() => {
     runMigrations().catch((err) => {
@@ -35,6 +36,10 @@ const HomeScreen = () => {
     navigation.navigate('Serviços');
   };
 
+  const handleRankingPress = () => {
+    stackNavigation.navigate('Ranking');
+  };
+
   const renderScreen = () => {
     return (
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -43,10 +48,17 @@ const HomeScreen = () => {
           <Text style={styles.title}>HANDYMAN</Text>
           <Text style={styles.headerTitle}>Não faça você mesmo,{'\n'}encontre um profissional!</Text>
           <Text style={styles.headerSubtitle}>A sua plataforma confiável para serviços manuais!</Text>
-          <TouchableOpacity style={styles.discoverButton} onPress={handleDiscoverPress}>
-            <Text style={styles.discoverButtonText}>Descubra</Text>
-            <ArrowRight color="#B54708" size={24} />
-          </TouchableOpacity>
+          
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.discoverButton} onPress={handleDiscoverPress}>
+              <Text style={styles.discoverButtonText}>Descubra</Text>
+              <ArrowRight color="#B54708" size={24} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.rankingButton} onPress={handleRankingPress}>
+              <Text style={styles.rankingButtonText}>🏆 Ranking</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Nossa Essência Section */}
@@ -108,6 +120,11 @@ const styles = StyleSheet.create({
     color: '#666666',
     marginBottom: 24,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
   discoverButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -117,14 +134,26 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    alignSelf: 'flex-start',
-    marginTop: 8,
+    flex: 1,
   },
   discoverButtonText: {
     color: '#B54708',
     fontSize: 16,
     fontWeight: '500',
     marginRight: 8,
+  },
+  rankingButton: {
+    backgroundColor: '#A75C00',
+    borderRadius: 25,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rankingButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   essenciaSection: {
     padding: 24,
@@ -198,105 +227,18 @@ const styles = StyleSheet.create({
   },
   serviceItem: {
     alignItems: 'center',
-    width: '30%',
+    width: '48%',
     marginBottom: height * 0.02,
-    backgroundColor: '#fff',
-    padding: width * 0.03,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
   },
   serviceIcon: {
-    width: width * 0.15,
-    height: width * 0.15,
+    width: 60,
+    height: 60,
+    marginBottom: 8,
   },
   serviceText: {
-    marginTop: height * 0.01,
-    fontSize: width * 0.035,
-    fontWeight: '500',
-    color: '#black',
-  },
-  howItWorks: {
-    marginTop: height * 0.03,
-    padding: width * 0.05,
-    backgroundColor: '#fff5e6',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  textSection: {
-    marginBottom: height * 0.02,
-  },
-  textPoint: {
-    fontSize: width * 0.04,
+    fontSize: 14,
     color: '#333',
-    marginBottom: height * 0.01,
-  },
-  testimonials: {
-    marginTop: height * 0.03,
-    padding: width * 0.05,
-    backgroundColor: '#fff5e6',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  testimonial: {
-    width: width * 0.8,
-    padding: width * 0.05,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    marginHorizontal: width * 0.02,
-  },
-  testimonialAuthor: {
-    fontSize: width * 0.04,
-    fontWeight: 'bold',
-    marginBottom: height * 0.01,
-    color: '#AD5700',
-  },
-  testimonialContent: {
-    fontSize: width * 0.035,
-    color: '#333',
-    textAlign: 'justify',
-  },
-  loginButton: {
-    backgroundColor: '#AD5700',
-    paddingVertical: width * 0.03,
-    paddingHorizontal: width * 0.1,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginRight: width * 0.02,
-  },
-  loginButtonText: {
-    color: 'white',
-    fontSize: width * 0.04,
-    fontWeight: 'bold',
-  },
-  cadastroButton: {
-    backgroundColor: '#AD5700',
-    paddingVertical: width * 0.03,
-    paddingHorizontal: width * 0.1,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginLeft: width * 0.02,
-  },
-  cadastroButtonText: {
-    color: 'white',
-    fontSize: width * 0.04,
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: height * 0.02,
+    textAlign: 'center',
   },
 });
 
