@@ -32,16 +32,39 @@ export const AvaliacaoUsuario: React.FC<AvaliacaoUsuarioProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    console.log('AvaliacaoUsuario: Iniciando carregamento da configuração');
     carregarConfiguracao();
   }, []);
 
   const carregarConfiguracao = async () => {
     try {
+      console.log('AvaliacaoUsuario: Fazendo requisição para configuração');
       const data = await RankingService.getConfiguracaoAspectos();
+      console.log('AvaliacaoUsuario: Configuração carregada:', data);
       setConfiguracao(data);
     } catch (error) {
       console.error('Erro ao carregar configuração:', error);
-      Alert.alert('Erro', 'Erro ao carregar configuração de aspectos');
+      console.log('AvaliacaoUsuario: Usando configuração padrão');
+      // Usar configuração padrão se a API falhar
+      const configuracaoPadrao: ConfiguracaoAspectos = {
+        positivos: [
+          { valor: 'ajudou_processo', label: 'Ajudou no processo', peso: 25 },
+          { valor: 'foi_educado', label: 'Foi educado', peso: 20 },
+          { valor: 'pagamento_pontual', label: 'Pagamento pontual', peso: 30 },
+          { valor: 'comunicacao_clara', label: 'Comunicação clara', peso: 25 },
+          { valor: 'flexivel_horarios', label: 'Flexível com horários', peso: 15 },
+          { valor: 'respeitou_combinado', label: 'Respeitou combinado', peso: 25 }
+        ],
+        negativos: [
+          { valor: 'pagamento_atrasado', label: 'Pagamento atrasado', peso: 30 },
+          { valor: 'comunicacao_ruim', label: 'Comunicação ruim', peso: 20 },
+          { valor: 'cancelou_sem_motivo', label: 'Cancelou sem motivo', peso: 40 },
+          { valor: 'desrespeitou_horario', label: 'Desrespeitou horário', peso: 25 },
+          { valor: 'pedido_urgente', label: 'Pedido urgente', peso: 15 },
+          { valor: 'negociacao_dificil', label: 'Negociação difícil', peso: 20 }
+        ]
+      };
+      setConfiguracao(configuracaoPadrao);
     }
   };
 
@@ -98,7 +121,7 @@ export const AvaliacaoUsuario: React.FC<AvaliacaoUsuarioProps> = ({
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
       <Text style={styles.title}>Avaliar Cliente</Text>
 
       {/* Aspectos Positivos */}
@@ -195,15 +218,15 @@ export const AvaliacaoUsuario: React.FC<AvaliacaoUsuarioProps> = ({
           )}
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: 'white',
     padding: 20,
+    minHeight: 400,
   },
   loadingContainer: {
     flex: 1,

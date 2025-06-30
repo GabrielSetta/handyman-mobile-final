@@ -13,6 +13,7 @@ import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { FornecedorStackParamList } from '../../navigation/FornecedorStackNavigation';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Loading } from '../Loading';
+import { AvaliacaoUsuario } from '../ranking/AvaliacaoUsuario';
 
 type NavigationProp = CompositeNavigationProp<
     BottomTabNavigationProp<RootTabParamList>,
@@ -36,6 +37,7 @@ export const ExibirAgendamentoFornecedor: React.FC<ExibirAgendamentoFornecedorPr
     const token = useGetToken();
     const [showFullScreenImage, setShowFullScreenImage] = useState(false);
     const [currentImageUri, setCurrentImageUri] = useState('');
+    const [showAvaliacaoModal, setShowAvaliacaoModal] = useState(false);
     
     const handleStatusUpdate = async (update: { id_servico: string; novo_status: string }) => {
         if (agendamento && agendamento.id_servico === update.id_servico) {
@@ -147,6 +149,11 @@ export const ExibirAgendamentoFornecedor: React.FC<ExibirAgendamentoFornecedorPr
 
     const closeFullScreenImage = () => {
         setShowFullScreenImage(false);
+    };
+
+    const handleAvaliacaoConcluida = () => {
+        setShowAvaliacaoModal(false);
+        Alert.alert('Sucesso', 'Avaliação enviada com sucesso!');
     };
 
     if (loading) {
@@ -330,7 +337,7 @@ export const ExibirAgendamentoFornecedor: React.FC<ExibirAgendamentoFornecedorPr
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.button, styles.completeButton]}
-                                onPress={() => onPressAtualizarStatus('Aguardando pagamento')}
+                                onPress={() => onPressAtualizarStatus('concluido')}
                             >
                                 <Text style={styles.buttonText}>Finalizar</Text>
                             </TouchableOpacity>
@@ -342,6 +349,16 @@ export const ExibirAgendamentoFornecedor: React.FC<ExibirAgendamentoFornecedorPr
                             <Text style={styles.buttonText}>Contato</Text>
                         </TouchableOpacity>
                     </>
+                )}
+
+                {agendamento.status.toLowerCase() === 'concluido' && (
+                    <TouchableOpacity
+                        style={[styles.button, styles.evaluateButton, styles.fullWidthButton]}
+                        onPress={() => setShowAvaliacaoModal(true)}
+                    >
+                        <MaterialCommunityIcons name="star" size={20} color="white" style={{marginRight: 8}} />
+                        <Text style={styles.buttonText}>Avaliar Cliente</Text>
+                    </TouchableOpacity>
                 )}
             </View>
 
@@ -401,6 +418,41 @@ export const ExibirAgendamentoFornecedor: React.FC<ExibirAgendamentoFornecedorPr
                     {currentImageUri && (
                         <Image source={{ uri: currentImageUri }} style={styles.fullScreenImage} resizeMode="contain" />
                     )}
+                </View>
+            </Modal>
+
+            {/* Modal de Avaliação do Cliente */}
+            <Modal
+                visible={showAvaliacaoModal}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setShowAvaliacaoModal(false)}
+            >
+                <View style={styles.avaliacaoModalOverlay}>
+                                    <View style={styles.avaliacaoModalContent}>
+                    <View style={styles.avaliacaoHeader}>
+                        <Text style={styles.avaliacaoTitle}>Avaliar Cliente</Text>
+                        <TouchableOpacity onPress={() => setShowAvaliacaoModal(false)}>
+                            <MaterialCommunityIcons name="close" size={24} color="#666" />
+                        </TouchableOpacity>
+                    </View>
+                    <ScrollView 
+                        style={styles.avaliacaoScrollContainer} 
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ flexGrow: 1 }}
+                    >
+                        {agendamento ? (
+                            <AvaliacaoUsuario
+                                id_usuario={agendamento.id_usuario}
+                                id_servico={agendamento.id_servico}
+                                onAvaliacaoConcluida={handleAvaliacaoConcluida}
+                                onCancelar={() => setShowAvaliacaoModal(false)}
+                            />
+                        ) : (
+                            <Text>Carregando agendamento...</Text>
+                        )}
+                    </ScrollView>
+                </View>
                 </View>
             </Modal>
         </ScrollView>
@@ -616,6 +668,12 @@ const styles = StyleSheet.create({
     contactButton: {
         backgroundColor: '#9C27B0',
     },
+    evaluateButton: {
+        backgroundColor: '#FF9800',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -676,5 +734,35 @@ const styles = StyleSheet.create({
         top: 40,
         right: 20,
         zIndex: 1,
+    },
+    avaliacaoModalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    avaliacaoModalContent: {
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 20,
+        width: '95%',
+        maxHeight: '90%',
+    },
+    avaliacaoHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    avaliacaoTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    avaliacaoScrollContainer: {
+        maxHeight: 600,
     },
 });
