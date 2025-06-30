@@ -145,26 +145,7 @@ export const VisualizacaoRanking: React.FC<VisualizacaoRankingProps> = ({ id_usu
         </View>
       )}
 
-      {/* Aspectos Negativos */}
-      {estatisticas.aspectos_negativos.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>❌ Aspectos Mais Criticados</Text>
-          {estatisticas.aspectos_negativos.map((aspecto, index) => (
-            <View key={index} style={styles.aspectoItem}>
-              <Text style={styles.aspectoLabel}>{aspecto.aspecto}</Text>
-              <View style={styles.aspectoBar}>
-                <View
-                  style={[
-                    styles.aspectoBarFillNegativo,
-                    { width: `${aspecto.percentual}%` },
-                  ]}
-                />
-              </View>
-              <Text style={styles.aspectoPercentualNegativo}>{aspecto.percentual}%</Text>
-            </View>
-          ))}
-        </View>
-      )}
+
 
       {/* Mensagem quando não há avaliações */}
       {estatisticas.total_avaliacoes === 0 && (
@@ -324,22 +305,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     borderRadius: 3,
   },
-  aspectoBarFillNegativo: {
-    height: '100%',
-    backgroundColor: '#f44336',
-    borderRadius: 3,
-  },
   aspectoPercentual: {
     fontSize: 14,
     fontWeight: '600',
     color: '#4CAF50',
-    minWidth: 35,
-    textAlign: 'right',
-  },
-  aspectoPercentualNegativo: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#f44336',
     minWidth: 35,
     textAlign: 'right',
   },

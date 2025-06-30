@@ -13,18 +13,15 @@ import { useNavigation } from '@react-navigation/native';
 import { ArrowRight } from 'lucide-react-native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from '../navigation/TabNavigation';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AuthStackNavigation';
+
 
 const { width, height } = Dimensions.get('window');
 declare function require(path: string): any;
 
 type HomeScreenNavigationProp = BottomTabNavigationProp<RootTabParamList, 'Home'>;
-type StackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const stackNavigation = useNavigation<StackNavigationProp>();
 
   /*useEffect(() => {
     runMigrations().catch((err) => {
@@ -36,9 +33,7 @@ const HomeScreen = () => {
     navigation.navigate('Serviços');
   };
 
-  const handleRankingPress = () => {
-    stackNavigation.navigate('Ranking');
-  };
+
 
   const renderScreen = () => {
     return (
@@ -53,10 +48,6 @@ const HomeScreen = () => {
             <TouchableOpacity style={styles.discoverButton} onPress={handleDiscoverPress}>
               <Text style={styles.discoverButtonText}>Descubra</Text>
               <ArrowRight color="#B54708" size={24} />
-            </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.rankingButton} onPress={handleRankingPress}>
-              <Text style={styles.rankingButtonText}>🏆 Ranking</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -141,19 +132,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginRight: 8,
-  },
-  rankingButton: {
-    backgroundColor: '#A75C00',
-    borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rankingButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
   },
   essenciaSection: {
     padding: 24,
